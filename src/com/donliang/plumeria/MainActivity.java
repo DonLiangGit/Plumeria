@@ -13,18 +13,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.os.Build;
 
 public class MainActivity extends ActionBarActivity {
 
-	private Camera camObj;
+	private Camera camInstance;
+	private CameraPreview camPreview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        camObj = getCameraInstance();
-
+        camInstance = getCameraInstance();
+        
+        camPreview = new CameraPreview(this, camInstance);
+        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        preview.addView(camPreview);
         
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
