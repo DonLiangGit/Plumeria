@@ -894,6 +894,7 @@ containing a value of this type.
         public static final int activity_vertical_margin=0x7f080012;
     }
     public static final class drawable {
+        public static final int ab_background=0x7f020058;
         public static final int abc_ab_bottom_solid_dark_holo=0x7f020000;
         public static final int abc_ab_bottom_solid_light_holo=0x7f020001;
         public static final int abc_ab_bottom_transparent_dark_holo=0x7f020002;

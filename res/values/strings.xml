@@ -4,5 +4,6 @@
     <string name="app_name">Plumeria</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <drawable name="ab_background">#1A000000</drawable>
 
 </resources>

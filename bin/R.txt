@@ -139,6 +139,7 @@ int dimen abc_search_view_preferred_width 0x7f08000d
 int dimen abc_search_view_text_min_width 0x7f08000c
 int dimen activity_horizontal_margin 0x7f080011
 int dimen activity_vertical_margin 0x7f080012
+int drawable ab_background 0x7f020058
 int drawable abc_ab_bottom_solid_dark_holo 0x7f020000
 int drawable abc_ab_bottom_solid_light_holo 0x7f020001
 int drawable abc_ab_bottom_transparent_dark_holo 0x7f020002

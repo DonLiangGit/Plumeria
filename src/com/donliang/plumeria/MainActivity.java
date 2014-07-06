@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.os.Build;
 
@@ -23,13 +24,19 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        
-        camInstance = getCameraInstance();
+        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        getActionBar().setBackgroundDrawable(
+                getResources().getDrawable(R.drawable.ab_background));
+        setContentView(R.layout.activity_main);      
+            
+//        camInstance = getCameraInstance();
+        camInstance = getFrontFacingCamera();
         
         camPreview = new CameraPreview(this, camInstance);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(camPreview);
+        
+
         
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
@@ -47,20 +54,41 @@ public class MainActivity extends ActionBarActivity {
     	}
     }
 
-    public static Camera getCameraInstance() {
-    	Camera c = null;
-    	try {
-    		// import android.hardware.Camera instead, 
-    		// importing android.graphics.Camera, because graphics one does not have open().
-    		c = Camera.open();
-    	}
-    	catch (Exception e){
-    		// Camera is not available
-    	}
-		// will return null if the camera is not available.
-    	return c;
-    	
+//    public static Camera getCameraInstance() {
+//    	Camera c = null;
+//    	try {
+//    		// import android.hardware.Camera instead, 
+//    		// importing android.graphics.Camera, because graphics one does not have open().
+//    		c = Camera.open();
+//    	}
+//    	catch (Exception e){
+//    		// Camera is not available
+//    	}
+//		// will return null if the camera is not available.
+//    	return c;
+//    	
+//    }
+    
+    // Private
+    public static Camera getFrontFacingCamera() {
+		int camCount = 0;
+		Camera cam = null;
+		Camera.CameraInfo camInfo = new Camera.CameraInfo();
+		camCount = Camera.getNumberOfCameras();
+		
+		for ( int camIndex = 0; camIndex < camCount; camIndex ++ ) {
+			Camera.getCameraInfo(camIndex, camInfo);
+			if (camInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+				try {
+					cam = Camera.open(camIndex);
+				} catch (RuntimeException e) {
+					Log.e ("Frontfacing","Front-facing camera failed!" + e.getLocalizedMessage());
+				}
+			}
+		}
+    	return cam;
     }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         
