@@ -4,11 +4,12 @@ Plumeria
 * Preview Mode
   1. Actionbar overlay;
   2. No status bar displayed;
-  3. Customized bottom bar(Gallary, zoom)
+  3. Customized bottom bar(Gallary, zoom);
+  4. Switch between front and back camera of phone (if available);
 * Storage:
   1. Store image as jpeg;
 * Gallary；
-  1. Share to social network functions
+  1. Share to social network functions;
 and more...
 
 ==
