@@ -17,5 +17,7 @@ Plumeria
 and more...
 
 ==
-  Bug: see issues.
 
+* Issues
+  * Issues with Questions are not solved.
+  * Issues without Questions type got approriate solutions, but expected being improved much in the future
