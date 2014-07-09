@@ -5,7 +5,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera; 
+import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import android.os.Build;
 
 public class MainActivity extends ActionBarActivity {
@@ -24,20 +28,18 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Actionbar transparent
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-        getActionBar().setBackgroundDrawable(
-                getResources().getDrawable(R.drawable.ab_background));
+        getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_background));
         setContentView(R.layout.activity_main);      
             
-//        camInstance = getCameraInstance();
+        //camInstance = getCameraInstance();
         camInstance = getFrontFacingCamera();
         
         camPreview = new CameraPreview(this, camInstance);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(camPreview);
-        
-
-        
+                
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
 //                    .add(R.id.container, new PlaceholderFragment())
@@ -69,7 +71,6 @@ public class MainActivity extends ActionBarActivity {
 //    	
 //    }
     
-    // Private
     public static Camera getFrontFacingCamera() {
 		int camCount = 0;
 		Camera cam = null;
@@ -89,9 +90,26 @@ public class MainActivity extends ActionBarActivity {
     	return cam;
     }
     
+    private PictureCallback callback = new PictureCallback() {
+		@Override
+		public void onPictureTaken(byte[] data, Camera camera) {
+			// TODO Auto-generated method stub
+			Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+			if(bitmap == null) {
+				Toast.makeText(getApplicationContext(), "not taken", Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(getApplicationContext(), "taken", Toast.LENGTH_SHORT).show();
+			}
+			camInstance.release();
+		}    	
+    };
+    		
+    public void TakePicture(View view) {
+    	camInstance.takePicture(null, null, callback);
+    }
+    
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        
+    public boolean onCreateOptionsMenu(Menu menu) {      
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
