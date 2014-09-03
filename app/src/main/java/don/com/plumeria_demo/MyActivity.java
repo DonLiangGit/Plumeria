@@ -20,6 +20,7 @@ public class MyActivity extends TabActivity {
 
     private Camera camInstance;
     private CameraPreview cameraPreview;
+    FrameLayout preview;
 
     TabHost tabHost;
     ImageButton pictureTab;
@@ -31,14 +32,15 @@ public class MyActivity extends TabActivity {
 
         camInstance = getCamera();
         cameraPreview = new CameraPreview(this, camInstance);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(cameraPreview);
 
         setTabs();
     }
 
     public static Camera getCamera() {
-        Camera cam = Camera.open(0);
+        Camera cam = null;
+        cam = Camera.open();
         return cam;
     }
 
@@ -104,10 +106,24 @@ public class MyActivity extends TabActivity {
     @Override
     public void onPause() {
         super.onPause();
+        camInstance.stopPreview();
+        camInstance.release();
+        camInstance = null;
+
+        preview.removeView(cameraPreview);
+        cameraPreview = null;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        if(camInstance == null) {
+            camInstance = getCamera();
+        }
+        if(cameraPreview == null) {
+            cameraPreview = new CameraPreview(this, camInstance);
+            preview.addView(cameraPreview);
+        }
     }
+
 }
