@@ -2,8 +2,6 @@ package don.com.plumeria_demo;
 
 import android.app.TabActivity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +14,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 @SuppressWarnings("deprecation")
 public class MyActivity extends TabActivity {
@@ -80,11 +82,13 @@ public class MyActivity extends TabActivity {
     private Camera.PictureCallback captureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] bytes, Camera camera) {
-            Bitmap photoBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            if(photoBitmap == null){
-                Log.d("photo taking", "not taken");
-            } else {
-                Log.d("photo taking", "taken");
+            File pictureFile = new File("/sdcard/Cymera/" + System.currentTimeMillis() + ".jpeg");
+            try {
+                FileOutputStream fOS = new FileOutputStream(pictureFile);
+                fOS.write(bytes);
+                fOS.close();
+            } catch (IOException e){
+                Log.d("Save failed", "damn");
             }
         }
     };
