@@ -2,6 +2,8 @@ package don.com.plumeria_demo;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -62,11 +64,25 @@ public class MyActivity extends TabActivity {
         pictureTab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MyActivity.this, "Yo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MyActivity.this, "Captured.", Toast.LENGTH_SHORT).show();
+                // Callback for a photo capture
+                camInstance.takePicture(null, null, captureCallback);
             }
         });
 
     }
+
+    private Camera.PictureCallback captureCallback = new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] bytes, Camera camera) {
+            Bitmap photoBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            if(photoBitmap == null){
+                Toast.makeText(getApplicationContext(), "not taken", Toast.LENGTH_SHORT);
+            } else {
+                Toast.makeText(getApplicationContext(), "taken", Toast.LENGTH_SHORT);
+            }
+        }
+    };
 
     public void addNewTab(String labelID, int drawableID, Class<?> cls){
         Intent intent = new Intent().setClass(this, cls);
