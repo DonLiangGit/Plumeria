@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +16,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
 public class MyActivity extends TabActivity {
@@ -64,9 +64,14 @@ public class MyActivity extends TabActivity {
         pictureTab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MyActivity.this, "Captured.", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(MyActivity.this, "Captured.", Toast.LENGTH_SHORT).show();
                 // Callback for a photo capture
-                camInstance.takePicture(null, null, captureCallback);
+                camInstance.autoFocus(new Camera.AutoFocusCallback() {
+                    @Override
+                    public void onAutoFocus(boolean b, Camera camera) {
+                        camInstance.takePicture(null, null, captureCallback);
+                    }
+                });
             }
         });
 
@@ -77,9 +82,9 @@ public class MyActivity extends TabActivity {
         public void onPictureTaken(byte[] bytes, Camera camera) {
             Bitmap photoBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             if(photoBitmap == null){
-                Toast.makeText(getApplicationContext(), "not taken", Toast.LENGTH_SHORT);
+                Log.d("photo taking", "not taken");
             } else {
-                Toast.makeText(getApplicationContext(), "taken", Toast.LENGTH_SHORT);
+                Log.d("photo taking", "taken");
             }
         }
     };
