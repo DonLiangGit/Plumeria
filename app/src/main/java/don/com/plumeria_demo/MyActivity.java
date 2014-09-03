@@ -82,7 +82,7 @@ public class MyActivity extends TabActivity {
     private Camera.PictureCallback captureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] bytes, Camera camera) {
-            File pictureFile = new File("/sdcard/Cymera/" + System.currentTimeMillis() + ".jpeg");
+            File pictureFile = new File("/sdcard/Cymera/" + "Plumeria" + System.currentTimeMillis() + ".jpeg");
             try {
                 FileOutputStream fOS = new FileOutputStream(pictureFile);
                 fOS.write(bytes);
@@ -90,6 +90,7 @@ public class MyActivity extends TabActivity {
             } catch (IOException e){
                 Log.d("Save failed", "damn");
             }
+            camInstance.startPreview();
         }
     };
 
