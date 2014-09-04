@@ -4,6 +4,7 @@ import android.app.TabActivity;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,6 +41,14 @@ public class MyActivity extends TabActivity {
         preview.addView(cameraPreview);
 
         setTabs();
+
+        // Directory Creation for Photos
+        File photoDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Plumeria/");
+        if (photoDir.exists()) {
+            // Do nothing
+        } else {
+            photoDir.mkdir();
+        }
     }
 
     public static Camera getCamera() {
@@ -63,9 +72,9 @@ public class MyActivity extends TabActivity {
         tabHost.getTabWidget().getChildTabViewAt(2).setBackgroundDrawable(null);
 
         pictureTab = (ImageButton)findViewById(R.id.capture);
-        pictureTab.setOnClickListener(new View.OnClickListener() {
+        pictureTab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onLongClick(View view) {
                 // Toast.makeText(MyActivity.this, "Captured.", Toast.LENGTH_SHORT).show();
                 // Callback for a photo capture
                 camInstance.autoFocus(new Camera.AutoFocusCallback() {
@@ -74,6 +83,7 @@ public class MyActivity extends TabActivity {
                         camInstance.takePicture(null, null, captureCallback);
                     }
                 });
+                return true;
             }
         });
 
@@ -82,7 +92,8 @@ public class MyActivity extends TabActivity {
     private Camera.PictureCallback captureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] bytes, Camera camera) {
-            File pictureFile = new File("/sdcard/Cymera/" + "Plumeria" + System.currentTimeMillis() + ".jpeg");
+            File pictureFile = new File(Environment.getExternalStorageDirectory().getPath()
+                    + "/Plumeria/" + "Plumeria" + System.currentTimeMillis() + ".jpeg");
             try {
                 FileOutputStream fOS = new FileOutputStream(pictureFile);
                 fOS.write(bytes);
