@@ -2,6 +2,8 @@ package don.com.plumeria_demo;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,7 +17,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.graphics.Matrix;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,6 +47,7 @@ public class MyActivity extends TabActivity {
         setTabs();
 
         // Directory Creation for Photos
+        // Also do in background
         File photoDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Plumeria/");
         if (photoDir.exists()) {
             // Do nothing
@@ -91,12 +96,25 @@ public class MyActivity extends TabActivity {
 
     private Camera.PictureCallback captureCallback = new Camera.PictureCallback() {
         @Override
-        public void onPictureTaken(byte[] bytes, Camera camera) {
+        public void onPictureTaken(byte[] data, Camera camera) {
             File pictureFile = new File(Environment.getExternalStorageDirectory().getPath()
                     + "/Plumeria/" + "Plumeria" + System.currentTimeMillis() + ".jpeg");
+
+            // Rotatation byte before FileOutputStream
+            byte[] photoBytes;
+            Bitmap rotateBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            rotateBitmap = Bitmap.createBitmap(rotateBitmap, 0, 0, rotateBitmap.getWidth(), rotateBitmap.getHeight(), matrix, true);
+
+            // Compress and convert ByteArrayOutputStream
+            ByteArrayOutputStream BAOS = new ByteArrayOutputStream();
+            rotateBitmap.compress(Bitmap.CompressFormat.JPEG, 100, BAOS);
+            photoBytes = BAOS.toByteArray();
+
             try {
                 FileOutputStream fOS = new FileOutputStream(pictureFile);
-                fOS.write(bytes);
+                fOS.write(photoBytes);
                 fOS.close();
             } catch (IOException e){
                 Log.d("Save failed", "damn");
