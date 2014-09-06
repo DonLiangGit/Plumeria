@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -23,7 +24,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -35,7 +35,10 @@ public class MyActivity extends TabActivity {
 
     private Camera camInstance;
     private CameraPreview cameraPreview;
-    FrameLayout preview;
+    private SurfaceHolder previewHolder = null;
+    private FrameLayout preview;
+    private boolean inPreview = false;
+    private int currentCameraID = 0;
 
     UIOrientationEventListener uiOrientationEventListener;
 
@@ -50,8 +53,11 @@ public class MyActivity extends TabActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
 
-        camInstance = getCamera();
+        camInstance = getCamera(currentCameraID);
         cameraPreview = new CameraPreview(this, camInstance);
+        previewHolder = cameraPreview.getHolder();
+        previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
         preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(cameraPreview);
 
@@ -82,16 +88,34 @@ public class MyActivity extends TabActivity {
         switch_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getBaseContext(), "Yo", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getBaseContext(), "Yo", Toast.LENGTH_SHORT).show();
+                if(inPreview) {
+                    camInstance.stopPreview();
+                }
+                camInstance.release();
+                preview.removeView(cameraPreview);
+                cameraPreview = null;
+
+                // Swap the camera based on ID
+                if(currentCameraID == 0) {
+                    currentCameraID = 1;
+                } else {
+                    currentCameraID = 0;
+                }
+                camInstance = getCamera(currentCameraID);
+
+                if(cameraPreview == null) {
+                    cameraPreview = new CameraPreview(getApplicationContext(), camInstance);
+                    preview.addView(cameraPreview);
+                }
             }
         });
 
 
     }
 
-    public static Camera getCamera() {
-        Camera cam = null;
-        cam = Camera.open();
+    public static Camera getCamera(int currentCameraID) {
+        Camera cam = Camera.open(currentCameraID);
         return cam;
     }
 
@@ -150,7 +174,7 @@ public class MyActivity extends TabActivity {
                 fOS.write(photoBytes);
                 fOS.close();
             } catch (IOException e){
-                Log.d("Save failed", "damn");
+                Log.d("Save failed", "Check bugs");
             }
             camInstance.startPreview();
         }
@@ -193,20 +217,23 @@ public class MyActivity extends TabActivity {
 
     @Override
     public void onPause() {
-        super.onPause();
-        camInstance.stopPreview();
+        if(inPreview) {
+            camInstance.stopPreview();
+        }
         camInstance.release();
         camInstance = null;
+        inPreview = false;
 
         preview.removeView(cameraPreview);
         cameraPreview = null;
+        super.onPause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         if(camInstance == null) {
-            camInstance = getCamera();
+            camInstance = getCamera(currentCameraID);
         }
         if(cameraPreview == null) {
             cameraPreview = new CameraPreview(this, camInstance);
