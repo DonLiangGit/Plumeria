@@ -1,23 +1,29 @@
 package don.com.plumeria_demo;
 
 import android.app.TabActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.OrientationEventListener;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.graphics.Matrix;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,8 +37,13 @@ public class MyActivity extends TabActivity {
     private CameraPreview cameraPreview;
     FrameLayout preview;
 
+    UIOrientationEventListener uiOrientationEventListener;
+
     TabHost tabHost;
     ImageButton pictureTab;
+
+    LayoutInflater panelInflater = null;
+    Button switch_camera = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +65,28 @@ public class MyActivity extends TabActivity {
         } else {
             photoDir.mkdir();
         }
+
+        // Orientation Listener
+        uiOrientationEventListener = new UIOrientationEventListener(this, SensorManager.SENSOR_DELAY_NORMAL);
+        if (uiOrientationEventListener.canDetectOrientation()) {
+            uiOrientationEventListener.enable();
+        }
+
+        // Layout overlay SurfaceOverview
+        panelInflater = LayoutInflater.from(getBaseContext());
+        View viewControl = panelInflater.inflate(R.layout.control_panel, null);
+        LayoutParams layoutParamsControl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        this.addContentView(viewControl, layoutParamsControl);
+
+        switch_camera = (Button)findViewById(R.id.button);
+        switch_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getBaseContext(), "Yo", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     public static Camera getCamera() {
@@ -181,4 +214,35 @@ public class MyActivity extends TabActivity {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    // OrientationEventListener class for UI
+    public class UIOrientationEventListener extends OrientationEventListener {
+
+        public UIOrientationEventListener(Context context, int rate) {
+            super(context, rate);
+        }
+
+        @Override
+        public void onOrientationChanged(int arg0) {
+            // when orientation changes
+            if(arg0 == OrientationEventListener.ORIENTATION_UNKNOWN) {
+                return;
+            } else if(arg0 > 315 || arg0 <= 45) {
+                arg0 = 0;
+            } else if(arg0 > 45 && arg0 <= 135) {
+                // Counter clockwise 90
+                arg0 = 90;
+            } else if(arg0 > 135 && arg0 <= 225) {
+                arg0 = 180;
+            } else if(arg0 > 225 && arg0 <= 315) {
+                arg0 = 270;
+            }
+
+            Log.d("oc", String.valueOf(arg0));
+        }
+    }
 }
