@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -47,6 +48,7 @@ public class MyActivity extends TabActivity {
 
     LayoutInflater panelInflater = null;
     Button switch_camera = null;
+    Button flashlightBtn = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,9 @@ public class MyActivity extends TabActivity {
 
         preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(cameraPreview);
+
+        // Parameters for FlashLight
+        final Camera.Parameters parameters = camInstance.getParameters();
 
         setTabs();
 
@@ -108,6 +113,16 @@ public class MyActivity extends TabActivity {
                     cameraPreview = new CameraPreview(getApplicationContext(), camInstance);
                     preview.addView(cameraPreview);
                 }
+            }
+        });
+
+        flashlightBtn = (Button)findViewById(R.id.flashlight_btn);
+        flashlightBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "yo", Toast.LENGTH_SHORT).show();
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+                camInstance.setParameters(parameters);
             }
         });
 
